@@ -85,4 +85,43 @@ class DepartamentsController extends Controller
             ],400);
         }
     }
+
+    // Listado de departamentos que posee un país ejercicio 1
+
+    public function solution1($country_id)
+
+    {
+
+        try {
+            $departaments = Departament::select('name')->where('country_id', $country_id)->get();
+            return response()->json([
+                $departaments
+            ],200);{}
+        } catch (\Throwable $th) {
+            return response()->json([
+                'errors'=>$th
+            ],400);
+        }
+    }
+
+    // Cantidad de departamentos que posee un país ejercicio 2
+
+    public function solution2($country_id)
+
+    {
+
+        try {
+            $departaments = Departament::select('name')->where('country_id', $country_id)->count();
+            return response()->json([
+                $departaments
+            ],200);{}
+        } catch (\Throwable $th) {
+            return response()->json([
+                'errors'=>$th
+            ],400);
+        }
+    }
+
 }
+
+

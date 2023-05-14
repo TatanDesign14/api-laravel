@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use DB;
+use Carbon\Carbon;
 
 class UsersController extends Controller
 {
@@ -83,5 +85,73 @@ class UsersController extends Controller
                 'errors' => $th
             ],400);
         }
+    }
+
+    //Listado de usuarios que pertenecen a una escuela Ejercicio 4
+
+    public function solution4($school_id)
+
+    {
+        $users = DB::table('users')
+        ->join('schools', 'users.school_id', '=', 'schools.id')
+        ->select( 'schools.name as school_name','users.name as user_name', 'users.last_name')
+        ->where('schools.id', '=', $school_id)
+        ->get();
+
+        return response()->json(['users' => $users]);
+
+    }
+
+    // Listado de usuarios que pertenecen a determinado país ejercicio 5
+
+    public function solution5($country_id)
+
+    {
+
+        $users = DB::table('users')
+        ->join('countries', 'users.country_id', '=', 'countries.id')
+        ->select( 'countries.name as country_name','users.name as user_name', 'users.last_name')
+        ->where('countries.id', '=', $country_id)
+        ->get();
+
+        return response()->json(['users' => $users]);
+    }
+
+    // Listado de usuarios que tienen correo @gmail.com ejercicio 6
+
+    public function solution6()
+
+    {
+
+        $users = DB::table('users')
+                ->select('users.name', 'users.last_name', 'users.email')
+                ->where('users.email', 'LIKE', '%@gmail.com')
+                ->get();
+
+        return response()->json(['users' => $users]);
+    }
+
+    // Listado de usuarios con los días faltantes para cumplir años ejercicio 7
+
+    public function solution7()
+
+    {
+        $users = DB::table('users')->select('*')->get();
+
+        foreach ($users as $user) {
+        $birthday = Carbon::parse($user->date_birth);
+        $birthday->year(Carbon::now()->year);
+        $today = Carbon::now();
+        $missing = $today->diffInDays($birthday, false);
+
+        if ($missing < 0) {
+            $today->year(Carbon::now()->year + 1);
+            $missing = $today->diffInDays($birthday, false);
+        }
+
+        $user->days_missing = $missing;
+    }
+
+        return response()->json($users);
     }
 }
